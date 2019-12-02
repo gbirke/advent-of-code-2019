@@ -1,7 +1,8 @@
 #lang racket/base
 
 (require racket/list
-		 racket/string)
+		 racket/string
+		 racket/function)
 
 (define (intcode op pos lst)
   	; Uncomment to debug
@@ -29,7 +30,24 @@
 		[(= opcode 2) (run-program (update-list * lst pos) (+ pos 4) )]
 	  )))
 
+(define (try-program noun verb lst)
+  (first (run-program (list-set (list-set lst 1 noun) 2 verb) )))
+
 (define (read-program str)
   (map string->number (map string-trim (string-split str ","))))
 
-(provide intcode update-list run-program read-program)
+(define (brute-force-solutions expected-result solution-function)
+  (first (filter identity (for*/list ([noun (in-range 99)]
+		 [verb (in-range 99)])
+	(if (= expected-result (solution-function noun verb))
+	  (list noun verb)
+	  #f
+	)
+	))))
+
+(provide intcode
+		 update-list
+		 run-program
+		 read-program
+		 try-program
+		 brute-force-solutions)

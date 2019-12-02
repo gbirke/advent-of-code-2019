@@ -17,3 +17,11 @@
 (check-equal? (run-program '(1 9 10 3 2 3 11 0 99 30 40 50)) '(3500 9 10 70 2 3 11 0 99 30 40 50) "Example")
 
 (check-equal? (read-program "1,2,3, 4, 5") '(1 2 3 4 5) "Read program")
+
+(check-equal? (try-program 0 0 '(1 9 10 3 2 3 11 0 99 30 40 50)) 100 "Returns result for 0 0")
+(check-equal? (try-program 1 2 '(1 9 10 3 2 3 11 0 99 30 40 50)) 150 "Returns result for 1 2")
+
+(define (test-multi noun verb)
+  (* noun verb))
+
+(check-equal? (brute-force-solutions 188 test-multi) '(2 94) "Iterates functions until solution is found")
