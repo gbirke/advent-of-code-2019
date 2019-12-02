@@ -13,3 +13,6 @@ compiled/
 
 # Dependency tracking files
 *.dep
+
+# input fiels from advent of code
+input.txt
