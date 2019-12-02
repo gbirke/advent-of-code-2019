@@ -2,14 +2,17 @@
 #lang racket/base
 
 (require rackunit
-         "intcode.rkt")
+		 racket/list
+         "intcode2.rkt")
 
 
-(check-equal? (intcode + 0 '(1 2 3 3)) 6 "Apply operation to position 1 and 2, start at 0")
-(check-equal? (intcode * 1 '(1 2 3 3)) 9 "Apppy operation to position 1 and 2, start at 1")
+(check-equal? (op-addition 0 '(1 2 3 3)) (list + 2 3) "Generate addition at 0")
+(check-equal? (op-addition 1 '(1 2 3 3)) (list + 3 3) "Generate addition at 1")
 
-(check-equal? (update-list + '(1 2 1 0)) '(3 2 1 0) "Updates list at position, start at 0")
-(check-equal? (update-list * '(1 2 3 3 0) 1) '(9 2 3 3 0) "Updates list at position, start at 1")
+(check-equal? (run-op (op-addition 0 '(1 2 3 3)) '(1 2 3 3)) 6 "Apply operation to position 1 and 2, start at 0")
+
+(check-equal? (update-list (list (lambda () 5)) '(1 2 1 0) 0) '(5 2 1 0) "Updates list at position, start at 0")
+(check-equal? (update-list (list (lambda () 99)) '(1 2 3 3 0) 1) '(99 2 3 3 0) "Updates list at position, start at 1")
 
 (check-equal? (run-program '(99)) '(99) "Stops at opcode 99")
 (check-equal? (run-program '(1 4 0 0 99)) '(100 4 0 0 99) "Runs addition")
