@@ -9,4 +9,8 @@
 (check-equal? (check-digit 123456) #f "only ascending and no duplicate digits")
 (check-equal? (check-digit 322345) #f "descending and duplicate digits")
 (check-equal? (check-digit 323457) #f "descending and no duplicate digits")
-;(check-equal? (split-digit 122345) (cons 12234 5) "split last number from digit")
+
+(check-equal? (add-repeating 1 '()) '((1)) "Add to empty list")
+(check-equal? (add-repeating 1 '((1))) '((1 1)) "Add to existing list")
+(check-equal? (add-repeating 1 '((1 1))) '((1 1 1)) "Add to existing list")
+(check-equal? (add-repeating 2 '((1))) '((2)(1)) "Add to existing list")
