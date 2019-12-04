@@ -1,0 +1,12 @@
+#lang racket/base
+
+(require rackunit
+		 racket/list
+         "digits.rkt")
+
+
+(check-equal? (check-digit 122345) #t "ascending and duplicate digits")
+(check-equal? (check-digit 123456) #f "only ascending and no duplicate digits")
+(check-equal? (check-digit 322345) #f "descending and duplicate digits")
+(check-equal? (check-digit 323457) #f "descending and no duplicate digits")
+;(check-equal? (split-digit 122345) (cons 12234 5) "split last number from digit")
