@@ -92,6 +92,26 @@
 	  (cons (p1 memory (+ address 1)) output)
 )))
 
+(define (op-jump-if-true memory address input output)
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)])
+	(if (eq? 0 (p1 memory (+ address 1)))
+	  (list memory (+ address 3) input output )
+	  (list memory (p2 memory (+ address 2)) input output )
+	)
+))
+
+(define (op-jump-if-zero memory address input output)
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)])
+	(if (eq? 0 (p1 memory (+ address 1)))
+	  (list memory (p2 memory (+ address 2)) input output )
+	  (list memory (+ address 3) input output )
+	)
+))
+
 (define (run-program memory [instruction-pointer 0] [input '()] [output '()] )
   (let ([opcode (read-memory memory instruction-pointer)])
 	(cond
@@ -100,10 +120,13 @@
 			[(= 2 (nth-digit opcode 1)) (apply run-program (op-multiplication memory instruction-pointer input output))]
 			[(= 3 opcode)               (apply run-program (op-input memory instruction-pointer input output))]
 			[(= 4 (nth-digit opcode 1)) (apply run-program (op-output memory instruction-pointer input output))]
-			[else (printf "Unkown opcode ~a at counter ~a" opcode instruction-pointer)]
+			[(= 5 (nth-digit opcode 1)) (apply run-program (op-jump-if-true memory instruction-pointer input output))]
+			[(= 6 (nth-digit opcode 1)) (apply run-program (op-jump-if-zero memory instruction-pointer input output))]
+			[else (printf "Unkown opcode ~a at counter ~a~n" opcode instruction-pointer)]
 	     ))
 	
 	)
+(trace run-program)
 
 (define (read-program str)
   (map string->number (map string-trim (string-split str ","))))
