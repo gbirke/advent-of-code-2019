@@ -14,21 +14,45 @@
 (define (write-to-memory memory address value)
   (list-set memory address value))
 
+(define p1-digit 3)
+(define p2-digit 4)
+
+(define (nth-digit num n)
+  (floor (/
+		   (modulo num (expt 10 n ))
+		   (expt 10 (- n 1))
+		   )))
+
+
+(define (get-mode opcode mode-position)
+  (let ([mode-digit (nth-digit opcode mode-position)])
+	(cond 
+	  [(= 0 mode-digit) read-memory-pointer]
+	  [(= 1 mode-digit) read-memory]
+	)
+  ))
+
 (define (op-addition memory address)
-  (list 
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)])
+	(list 
 	(lambda (v1 v2 write-address) (write-to-memory memory write-address (+ v1 v2)))
-	(read-memory-pointer memory (+ address 1))
-	(read-memory-pointer memory (+ address 2))
+  	(p1 memory (+ address 1))
+  	(p2 memory (+ address 2))
 	(read-memory memory (+ address 3))
-))
+)))
 
 (define (op-multiplication memory address)
-  (list 
-	(lambda (v1 v2 write-address) (write-to-memory memory write-address (* v1 v2)))
-	(read-memory-pointer memory (+ address 1))
-	(read-memory-pointer memory (+ address 2))
-	(read-memory memory (+ address 3))
-))
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)])
+	(list 
+		(lambda (v1 v2 write-address) (write-to-memory memory write-address (* v1 v2)))
+		(p1 memory (+ address 1))
+		(p2 memory (+ address 2))
+		(read-memory memory (+ address 3))
+)))
 
 (define (run-op opcode)
   (apply (first opcode) (rest opcode )))
@@ -62,10 +86,12 @@
   (let ([opcode (list-ref memory instruction-pointer)])
 	(cond
 			[(= opcode 99) (list output input memory)]
-			[(= opcode 1) (run-instruction (op-addition memory instruction-pointer))]
-			[(= opcode 2) (run-instruction (op-multiplication memory instruction-pointer))]
+			[(= (nth-digit opcode 1) 1) (run-instruction (op-addition memory instruction-pointer))]
+			[(= (nth-digit opcode 1) 2) (run-instruction (op-multiplication memory instruction-pointer))]
 			[(= opcode 3) (run-input)]
 			[(= opcode 4) (run-output)]
+			[(= opcode 104) (run-output)]
+			[else (printf "Unkown opcode ~a at counter ~a" opcode instruction-pointer)]
 	     ))
 	
 	)
@@ -78,4 +104,5 @@
 		 run-op
 		 run-program
 		 read-program
+		 nth-digit
 		 )
