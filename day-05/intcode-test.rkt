@@ -30,4 +30,35 @@
 (check-equal? (program-output '(106 1 8 104 77 104 88 99 5 ) '(0)) '(88 77) "If-zero to next instruction if value is 1")
 
 
+(check-equal? (program-output '(3 0 7 0 2 7 104 -1 99 ) '(8)) '(0) "Less than with 8 < 7 ")
+(check-equal? (program-output '(3 0 7 0 2 7 104 -1 99 ) '(7)) '(0) "Less than with 7 < 7 ")
+(check-equal? (program-output '(3 0 7 0 2 7 104 -1 99 ) '(3)) '(1) "Less than with 3 < 7 ")
+(check-equal? (program-output '(3 0 107 0 2 7 104 -1 99 ) '(3)) '(1) "Less than with 0 < 107 ")
+(check-equal? (program-output '(3 0 1007 0 2 7 104 -1 99 ) '(3)) '(0) "Less than with 3 < 2 ")
+(check-equal? (program-output '(3 0 1107 0 2 7 104 -1 99 ) '(3)) '(1) "Less than with 0 < 2 ")
 
+(check-equal? (program-output '(3 9 8 9 10 9 4 9 99 -1 8 ) '(3)) '(0) "Example 1 - 3 equal to 8 ")
+(check-equal? (program-output '(3 9 8 9 10 9 4 9 99 -1 8 ) '(8)) '(1) "Example 1 - 8 equal to 8 ")
+
+(check-equal? (program-output '(3 9 7 9 10 9 4 9 99 -1 8 ) '(3)) '(1) "Example 2 - 3 less than 8 ")
+(check-equal? (program-output '(3 9 7 9 10 9 4 9 99 -1 8 ) '(8)) '(0) "Example 2 - 8 less then 8 ")
+
+(check-equal? (program-output '(3 3 1108 -1 8 3 4 3 99 ) '(3)) '(0) "Example 3 - 3 equal to 8 ")
+(check-equal? (program-output '(3 3 1108 -1 8 3 4 3 99 ) '(8)) '(1) "Example 3 - 8 equal to 8 ")
+
+(check-equal? (program-output '(3 3 1107 -1 8 3 4 3 99 ) '(3)) '(1) "Example 4 - 3 equal to 8 ")
+(check-equal? (program-output '(3 3 1107 -1 8 3 4 3 99 ) '(8)) '(0) "Example 4 - 8 equal to 8 ")
+
+(check-equal? (program-output '(3 12 6 12 15 1 13 14 13 4 13 99 -1 0 1 9) '(3)) '(1) "Example 5 - 0 if input is 0")
+(check-equal? (program-output '(3 12 6 12 15 1 13 14 13 4 13 99 -1 0 1 9) '(0)) '(0) "Example 5 - 0 if input is 0")
+
+(check-equal? (program-output '(3 3 1105 -1 9 1101 0 0 12 4 12 99 1) '(3)) '(1) "Example 6 - 0 if input is 0")
+(check-equal? (program-output '(3 3 1105 -1 9 1101 0 0 12 4 12 99 1) '(3)) '(1) "Example 6 - 0 if input is 0")
+
+(let ([code '(3 21 1008 21 8 20 1005 20 22 107 8 21 20 1006 20 31 
+	1106 0 36 98 0 0 1002 21 125 20 4 20 1105 1 46 104 
+	999 1105 1 46 1101 1000 1 20 4 20 1105 1 46 98 99)])
+	(check-equal? (program-output code '(3)) '(999) "Example 7 - 999 if input below 8")
+	(check-equal? (program-output code '(8)) '(1000) "Example 7 - 999 if input equal 8")
+	(check-equal? (program-output code '(9)) '(1001) "Example 7 - 999 if input above 8")
+)

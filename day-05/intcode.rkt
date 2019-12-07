@@ -112,6 +112,49 @@
 	)
 ))
 
+(define (op-less-than memory address input output)
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)]
+		 [is-less (<
+			(p1 memory (+ address 1))
+			(p2 memory (+ address 2))
+		 )]
+
+		 )
+	(list 
+	  (write-to-memory
+		memory 
+		(read-memory memory (+ address 3))
+		(if is-less 1 0)
+	   )
+	   (+ address 4)
+	   input
+	   output
+	)
+))
+
+(define (op-equals memory address input output)
+  (let* ([opcode (read-memory memory address)]
+		 [p1 (get-mode opcode p1-digit)]
+		 [p2 (get-mode opcode p2-digit)]
+		 [is-eq (eq?
+			(p1 memory (+ address 1))
+			(p2 memory (+ address 2))
+		 )]
+
+		 )
+	(list 
+	  (write-to-memory
+		memory 
+		(read-memory memory (+ address 3))
+		(if is-eq 1 0)
+	   )
+	   (+ address 4)
+	   input
+	   output
+	)
+))
 (define (run-program memory [instruction-pointer 0] [input '()] [output '()] )
   (let ([opcode (read-memory memory instruction-pointer)])
 	(cond
@@ -122,11 +165,12 @@
 			[(= 4 (nth-digit opcode 1)) (apply run-program (op-output memory instruction-pointer input output))]
 			[(= 5 (nth-digit opcode 1)) (apply run-program (op-jump-if-true memory instruction-pointer input output))]
 			[(= 6 (nth-digit opcode 1)) (apply run-program (op-jump-if-zero memory instruction-pointer input output))]
+			[(= 7 (nth-digit opcode 1)) (apply run-program (op-less-than memory instruction-pointer input output))]
+			[(= 8 (nth-digit opcode 1)) (apply run-program (op-equals memory instruction-pointer input output))]
 			[else (printf "Unkown opcode ~a at counter ~a~n" opcode instruction-pointer)]
 	     ))
 	
 	)
-(trace run-program)
 
 (define (read-program str)
   (map string->number (map string-trim (string-split str ","))))
