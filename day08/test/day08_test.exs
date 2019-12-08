@@ -38,4 +38,24 @@ defmodule Day08Test do
     assert Day08.digit_product([1, 1, 1, 1, 1, 1]) == 0
     assert Day08.digit_product([2, 2, 2, 2, 2, 2]) == 0
   end
+
+  test "determine pixel color from layer pixels" do
+    assert Day08.pixel_color([1,2,0,1]) == 1
+    assert Day08.pixel_color([2,0,1,1]) == 0
+    assert Day08.pixel_color([2,2,2,2]) == 2
+    assert Day08.pixel_color([2,2,2,1]) == 1
+    assert Day08.pixel_color([2,2,2,0]) == 0
+  end
+
+  test "map layers to final image" do
+    assert Day08.combine_layers([
+      [0,2,2,2],
+      [1,1,2,2],
+      [2,2,1,2],
+      [0,0,0,0]]) == [0,1,1,0]
+  end
+
+  test "pixels to image" do
+    assert Day08.pixels_to_image([0,1,1,0,2,1], 2 ) == "█ \n █\n. "
+  end
 end
