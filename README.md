@@ -11,6 +11,8 @@ To run them with your own input, you need to place a file called `input.txt` in 
 | [Day 4: Secure Container](https://adventofcode.com/2019/day/4)| [digits](day-04/digits.rkt) | Racket |
 | [Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)| [intcode](day-05/intcode.rkt) | Racket |
 | [Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)| [intcode](day-07/amplifiers.rkt) | Racket |
+| [Day 8: Space Image Format](https://adventofcode.com/2019/day/8) | [day08](day08/lib/day08.ex) | Elixir |
+
 
 ## Development tip
 To run the tests whenever a file changes use [`entr`](http://eradman.com/entrproject/). Here is an example to run Racket:
