@@ -36,4 +36,24 @@ defmodule Day06 do
       fn orbit, acc_count -> orbit_count(orbit_map, orbit, acc_count, depth + 1) end
     )
   end
+
+  def orbit_path(orbit_map, start_planet, end_planet, transfers \\ []) do
+    transfers = [start_planet] ++ transfers
+    next_planet = Map.get(orbit_map, start_planet, nil)
+
+    cond do
+      # in case the end planet does not exist
+      next_planet == nil -> []
+      next_planet == end_planet -> [end_planet] ++ transfers
+      true -> orbit_path(orbit_map, next_planet, end_planet, transfers)
+    end
+  end
+
+  def common_ancestor(orbit_path_1, orbit_path_2, last_common_element \\ nil) do
+    if hd(orbit_path_1) == hd(orbit_path_2) do
+      common_ancestor(tl(orbit_path_1), tl(orbit_path_2), hd(orbit_path_1))
+    else
+      last_common_element
+    end
+  end
 end
