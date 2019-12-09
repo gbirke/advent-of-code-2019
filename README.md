@@ -10,6 +10,7 @@ To run them with your own input, you need to place a file called `input.txt` in 
 | [Day 2: 1202 Program Alarm](https://adventofcode.com/2019/day/2) | First try: [intcode](day-02/intcode.rkt)<br>More abstracted, domain-oriented solution: [intcode2](day-02/intcode2.rkt)  | Racket |
 | [Day 4: Secure Container](https://adventofcode.com/2019/day/4)| [digits](day-04/digits.rkt) | Racket |
 | [Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)| [intcode](day-05/intcode.rkt) | Racket |
+| [Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/6) | [day06](day06/lib/day06.ex) | Elixir |
 | [Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)| [intcode](day-07/amplifiers.rkt) | Racket |
 | [Day 8: Space Image Format](https://adventofcode.com/2019/day/8) | [day08](day08/lib/day08.ex) | Elixir |
 
