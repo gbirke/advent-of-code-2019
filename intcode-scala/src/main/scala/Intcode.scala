@@ -1,16 +1,18 @@
 class Intcode(
     val memory: Memory,
     val instructionCounter: Int = 0,
-    input: List[Int] = List(),
-    val output: List[Int] = List()
+    val input: List[Int] = List(),
+    val output: List[Int] = List(),
+    val state: Int = State.RUNNING
 ) {
 
   def copy(
-    memory: Memory = memory,
-    instructionCounter: Int = instructionCounter,
-    input: List[Int] = input,
-    output: List[Int] = output
-) = new Intcode( memory, instructionCounter, input, output )
+      memory: Memory = memory,
+      instructionCounter: Int = instructionCounter,
+      input: List[Int] = input,
+      output: List[Int] = output,
+      state: Int = state
+  ) = new Intcode(memory, instructionCounter, input, output, state)
 
   private def getParameter(offset: Int, mode: Int): Int = {
     mode match {
@@ -24,9 +26,9 @@ class Intcode(
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
     val target = getParameter(3, Mode.Parameter)
-    copy( 
+    copy(
       memory.write(target, p1 + p2),
-      instructionCounter + 4 
+      instructionCounter + 4
     )
   }
 
@@ -36,23 +38,27 @@ class Intcode(
     val target = getParameter(3, Mode.Parameter)
     copy(
       memory.write(target, p1 * p2),
-      instructionCounter + 4,
+      instructionCounter + 4
     )
   }
 
   private def op_write_input(): Intcode = {
-    val target = getParameter(1, Mode.Parameter)
-    copy(
-      memory.write(target, input.head),
-      instructionCounter + 2,
-      input.tail,
-    )
+    if (input.length > 0) {
+      val target = getParameter(1, Mode.Parameter)
+      copy(
+        memory.write(target, input.head),
+        instructionCounter + 2,
+        input.tail
+      )
+    } else {
+      copy(state = State.WAIT_FOR_INPUT)
+    }
   }
 
   private def op_output(param1Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
-    copy( 
-      instructionCounter = instructionCounter + 2, 
+    copy(
+      instructionCounter = instructionCounter + 2,
       output = output.::(value)
     )
   }
@@ -60,14 +66,16 @@ class Intcode(
   private def op_jumpIfTrue(param1Mode: Int, param2Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
     copy(
-      instructionCounter = if (value > 0) getParameter(2, param2Mode) else instructionCounter + 3
+      instructionCounter =
+        if (value > 0) getParameter(2, param2Mode) else instructionCounter + 3
     )
   }
 
   private def op_jumpIfFalse(param1Mode: Int, param2Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
     copy(
-      instructionCounter = if (value == 0) getParameter(2, param2Mode) else instructionCounter + 3
+      instructionCounter =
+        if (value == 0) getParameter(2, param2Mode) else instructionCounter + 3
     )
   }
 
@@ -77,7 +85,7 @@ class Intcode(
     val target: Int = getParameter(3, Mode.Parameter)
     copy(
       if (p1 < p2) memory.write(target, 1) else memory.write(target, 0),
-      instructionCounter + 4,
+      instructionCounter + 4
     )
   }
 
@@ -87,8 +95,12 @@ class Intcode(
     val target: Int = getParameter(3, Mode.Parameter)
     copy(
       if (p1 == p2) memory.write(target, 1) else memory.write(target, 0),
-      instructionCounter + 4,
+      instructionCounter + 4
     )
+  }
+
+  private def op_halt(): Intcode = {
+    copy(state = State.FINISHED)
   }
 
   private def modeStrToMode(modeStr: Char): Int = modeStr match {
@@ -105,11 +117,13 @@ class Intcode(
     )
   }
 
-  // TODO use success and failure to abort on invalid opcodes and avoid warning
   private def nextInstruction(): Intcode = {
+    if (state != State.RUNNING) {
+      return this
+    }
     val opcode = memory.read(instructionCounter)
     splitOpcode(opcode) match {
-      case (99, _, _)  => this
+      case (99, _, _)  => { op_halt().nextInstruction() }
       case (1, p1, p2) => { op_add(p1, p2).nextInstruction() }
       case (2, p1, p2) => { op_multiply(p1, p2).nextInstruction() }
       case (3, _, _)   => { op_write_input().nextInstruction() }
@@ -118,8 +132,12 @@ class Intcode(
       case (6, p1, p2) => { op_jumpIfFalse(p1, p2).nextInstruction() }
       case (7, p1, p2) => { op_lessThan(p1, p2).nextInstruction() }
       case (8, p1, p2) => { op_equals(p1, p2).nextInstruction() }
+      case (_, _, _)   => copy(state = State.INVALID_OPCODE)
     }
   }
+
+  def continueWithInput(input: List[Int]) =
+    copy(input = input, state = State.RUNNING).nextInstruction()
 }
 
 object Intcode {
@@ -130,4 +148,11 @@ object Intcode {
 object Mode {
   val Immediate = 0
   val Parameter = 1
+}
+
+object State {
+  val RUNNING = 0
+  val FINISHED = 99
+  val WAIT_FOR_INPUT = 1
+  val INVALID_OPCODE = 666
 }

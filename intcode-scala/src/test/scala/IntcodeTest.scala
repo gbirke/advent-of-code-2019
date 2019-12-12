@@ -129,6 +129,36 @@ class IntcodeTests extends FunSuite {
     assert(below8.output == List(999))
     assert(exactly8.output == List(1000))
     assert(above8.output == List(1001))
+  }
 
+  test("it has state finished when it halts") {
+    assert(Intcode.runProgram(List(99)).state == State.FINISHED)
+  }
+
+  test("it has state invalid opcode when it encounters invalid opcodes") {
+    assert(Intcode.runProgram(List(0)).state == State.INVALID_OPCODE)
+  }
+
+  test("it halts execution when waiting for input") {
+    val start = Intcode.runProgram(List(3, 0, 4, 0, 99))
+    assert(start.state == State.WAIT_FOR_INPUT)
+    assert(start.instructionCounter == 0)
+    val continued = start.continueWithInput(List(42))
+    assert(continued.state == State.FINISHED)
+    assert(continued.output == List(42))
+  }
+
+  test("continueWithInput keeps program state when not waiting for input") {
+    val haltedProgram = Intcode.runProgram(List(99)).continueWithInput(List(1,2,3))
+    val invalidPrgram = Intcode.runProgram(List(0)).continueWithInput(List(1,2,3))
+    assert(haltedProgram.state == State.FINISHED)
+    assert(invalidPrgram.state == State.INVALID_OPCODE)
+  }
+
+  test("continueWithInput keeps input values when not waiting for input") {
+    val haltedProgram = Intcode.runProgram(List(99)).continueWithInput(List(1,2,3))
+    val invalidPrgram = Intcode.runProgram(List(0)).continueWithInput(List(1,2,3))
+    assert(haltedProgram.input == List(1,2,3))
+    assert(invalidPrgram.input == List(1,2,3))
   }
 }
