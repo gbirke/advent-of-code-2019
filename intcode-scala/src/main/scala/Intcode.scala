@@ -5,6 +5,13 @@ class Intcode(
     val output: List[Int] = List()
 ) {
 
+  def copy(
+    memory: Memory = memory,
+    instructionCounter: Int = instructionCounter,
+    input: List[Int] = input,
+    output: List[Int] = output
+) = new Intcode( memory, instructionCounter, input, output )
+
   private def getParameter(offset: Int, mode: Int): Int = {
     mode match {
       case Mode.Immediate =>
@@ -17,11 +24,9 @@ class Intcode(
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
     val target = getParameter(3, Mode.Parameter)
-    new Intcode(
+    copy( 
       memory.write(target, p1 + p2),
-      instructionCounter + 4,
-      input,
-      output
+      instructionCounter + 4 
     )
   }
 
@@ -29,51 +34,40 @@ class Intcode(
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
     val target = getParameter(3, Mode.Parameter)
-    new Intcode(
+    copy(
       memory.write(target, p1 * p2),
       instructionCounter + 4,
-      input,
-      output
     )
   }
 
   private def op_write_input(): Intcode = {
     val target = getParameter(1, Mode.Parameter)
-    new Intcode(
+    copy(
       memory.write(target, input.head),
       instructionCounter + 2,
       input.tail,
-      output
     )
   }
 
   private def op_output(param1Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
-    new Intcode(
-      memory,
-      instructionCounter + 2,
-      input,
-      output.::(value)
+    copy( 
+      instructionCounter = instructionCounter + 2, 
+      output = output.::(value)
     )
   }
 
   private def op_jumpIfTrue(param1Mode: Int, param2Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
-    new Intcode(
-      memory,
-      if (value > 0) getParameter(2, param2Mode) else instructionCounter + 3,
-      input,
-      output
+    copy(
+      instructionCounter = if (value > 0) getParameter(2, param2Mode) else instructionCounter + 3
     )
   }
 
   private def op_jumpIfFalse(param1Mode: Int, param2Mode: Int): Intcode = {
     val value: Int = getParameter(1, param1Mode)
-    new Intcode(
-      memory,
-      if (value == 0) getParameter(2, param2Mode) else instructionCounter + 3,
-      input,
-      output
+    copy(
+      instructionCounter = if (value == 0) getParameter(2, param2Mode) else instructionCounter + 3
     )
   }
 
@@ -81,11 +75,9 @@ class Intcode(
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
     val target: Int = getParameter(3, Mode.Parameter)
-    new Intcode(
+    copy(
       if (p1 < p2) memory.write(target, 1) else memory.write(target, 0),
       instructionCounter + 4,
-      input,
-      output
     )
   }
 
@@ -93,11 +85,9 @@ class Intcode(
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
     val target: Int = getParameter(3, Mode.Parameter)
-    new Intcode(
+    copy(
       if (p1 == p2) memory.write(target, 1) else memory.write(target, 0),
       instructionCounter + 4,
-      input,
-      output
     )
   }
 
