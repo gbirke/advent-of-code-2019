@@ -13,6 +13,7 @@ To run them with your own input, you need to place a file called `input.txt` in 
 | [Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/6) | [day06](day06/lib/day06.ex) | Elixir |
 | [Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)| [intcode](day-07/amplifiers.rkt) | Racket |
 | [Day 8: Space Image Format](https://adventofcode.com/2019/day/8) | [day08](day08/lib/day08.ex) | Elixir |
+| [Day 12: The N-Body Problem](https://adventofcode.com/2019/day/12) | 1st puzzle [day12](day12/lib/day12.ex) | Elixir |
 
 
 ## Development tip
