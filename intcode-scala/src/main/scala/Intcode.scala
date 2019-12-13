@@ -1,20 +1,20 @@
 class Intcode(
     val memory: Memory,
-    val instructionCounter: Int = 0,
-    val input: List[Int] = List(),
-    val output: List[Int] = List(),
+    val instructionCounter: Long = 0,
+    val input: List[Long] = List(),
+    val output: List[Long] = List(),
     val state: Int = State.RUNNING
 ) {
 
   def copy(
       memory: Memory = memory,
-      instructionCounter: Int = instructionCounter,
-      input: List[Int] = input,
-      output: List[Int] = output,
+      instructionCounter: Long = instructionCounter,
+      input: List[Long] = input,
+      output: List[Long] = output,
       state: Int = state
   ) = new Intcode(memory, instructionCounter, input, output, state)
 
-  private def getParameter(offset: Int, mode: Int): Int = {
+  private def getParameter(offset: Int, mode: Int): Long = {
     mode match {
       case Mode.Immediate =>
         memory.read(memory.read(instructionCounter, offset))
@@ -56,7 +56,7 @@ class Intcode(
   }
 
   private def op_output(param1Mode: Int): Intcode = {
-    val value: Int = getParameter(1, param1Mode)
+    val value: Long = getParameter(1, param1Mode)
     copy(
       instructionCounter = instructionCounter + 2,
       output = output.::(value)
@@ -64,7 +64,7 @@ class Intcode(
   }
 
   private def op_jumpIfTrue(param1Mode: Int, param2Mode: Int): Intcode = {
-    val value: Int = getParameter(1, param1Mode)
+    val value: Long = getParameter(1, param1Mode)
     copy(
       instructionCounter =
         if (value > 0) getParameter(2, param2Mode) else instructionCounter + 3
@@ -72,7 +72,7 @@ class Intcode(
   }
 
   private def op_jumpIfFalse(param1Mode: Int, param2Mode: Int): Intcode = {
-    val value: Int = getParameter(1, param1Mode)
+    val value: Long = getParameter(1, param1Mode)
     copy(
       instructionCounter =
         if (value == 0) getParameter(2, param2Mode) else instructionCounter + 3
@@ -82,7 +82,7 @@ class Intcode(
   private def op_lessThan(param1Mode: Int, param2Mode: Int): Intcode = {
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
-    val target: Int = getParameter(3, Mode.Parameter)
+    val target: Long = getParameter(3, Mode.Parameter)
     copy(
       if (p1 < p2) memory.write(target, 1) else memory.write(target, 0),
       instructionCounter + 4
@@ -92,7 +92,7 @@ class Intcode(
   private def op_equals(param1Mode: Int, param2Mode: Int): Intcode = {
     val p1 = getParameter(1, param1Mode)
     val p2 = getParameter(2, param2Mode)
-    val target: Int = getParameter(3, Mode.Parameter)
+    val target: Long = getParameter(3, Mode.Parameter)
     copy(
       if (p1 == p2) memory.write(target, 1) else memory.write(target, 0),
       instructionCounter + 4
@@ -108,7 +108,7 @@ class Intcode(
     case '1' => Mode.Parameter
   }
 
-  private def splitOpcode(opcode: Int) = {
+  private def splitOpcode(opcode: Long):(Int,Int,Int) = {
     val opcodeParts = f"${opcode}%04d"
     (
       opcodeParts.slice(2, 4).toInt,
@@ -136,12 +136,12 @@ class Intcode(
     }
   }
 
-  def continueWithInput(input: List[Int]) =
+  def continueWithInput(input: List[Long]) =
     copy(input = input, state = State.RUNNING).nextInstruction()
 }
 
 object Intcode {
-  def runProgram(program: List[Int], input: List[Int] = List()) =
+  def runProgram(program: List[Long], input: List[Long] = List()) =
     new Intcode(Memory.loadProgram(program), 0, input).nextInstruction()
 }
 

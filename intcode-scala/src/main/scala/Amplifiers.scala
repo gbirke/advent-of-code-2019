@@ -1,7 +1,7 @@
-class Amplifier(program: List[Int], phaseSetting: Int) {
+class Amplifier(program: List[Long], phaseSetting: Long) {
   private var computer = Intcode.runProgram(program, List(phaseSetting))
   
-  def processInput(input: List[Int]): List[Int] = {
+  def processInput(input: List[Long]): List[Long] = {
     computer = computer.continueWithInput(input)
     computer.output
   }
@@ -10,15 +10,15 @@ class Amplifier(program: List[Int], phaseSetting: Int) {
     computer.state == State.FINISHED
   }
 
-  def output(): List[Int] = {
+  def output(): List[Long] = {
     computer.output
   }
 }
 
-class AmplifierChain(program: List[Int], phaseSettings: List[Int]) {
+class AmplifierChain(program: List[Long], phaseSettings: List[Long]) {
   private val amplifiers = phaseSettings.map( ps => new Amplifier(program, ps)).toVector
 
-  def runChainOnce(lastOutput:List[Int]=List(0), currentIndex: Int = 0): List[Int] = {
+  def runChainOnce(lastOutput:List[Long]=List(0), currentIndex: Int = 0): List[Long] = {
     if (currentIndex >= amplifiers.length ) {
       lastOutput
     }
@@ -28,7 +28,7 @@ class AmplifierChain(program: List[Int], phaseSettings: List[Int]) {
     }
   }
 
-  def runChainWithFeedback(lastOutput: List[Int]=List(0), currentIndex: Int = 0): Int = {
+  def runChainWithFeedback(lastOutput: List[Long]=List(0), currentIndex: Int = 0): Long = {
       val currentAmplifier = amplifiers(currentIndex % amplifiers.length)
       val output = currentAmplifier.processInput(lastOutput)
       if (amplifiers.last.programHasStopped) {
