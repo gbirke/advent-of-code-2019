@@ -161,4 +161,20 @@ class IntcodeTests extends FunSuite {
     assert(haltedProgram.input == List(1,2,3))
     assert(invalidPrgram.input == List(1,2,3))
   }
+
+  test("it adjusts relative base and supports relative addressing") {
+    val p = Intcode.runProgram(List(204, 1, 109, 3,204,1,99))
+    assert(p.output == List(204, 1))
+  }
+
+  test("it runs example 1 from day 9") {
+    val program: List[Long] = List(109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,101)
+    val p = Intcode.runProgram(program)
+    assert(p.output.reverse == program)
+  }
+
+  test("it runs example 2 from day 9") {
+    val p = Intcode.runProgram(List(1102,34915192,34915192,7,4,7,99,0))
+    assert(p.output == List[Long](1219070632396864L))
+  }
 }
