@@ -157,6 +157,8 @@ class Intcode(
 
   def continueWithInput(input: List[Long]) =
     copy(input = input, state = State.RUNNING).nextInstruction()
+
+  def clearOutput() = copy(output=List[Long]())
 }
 
 object Intcode {
