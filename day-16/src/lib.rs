@@ -4,8 +4,8 @@ const PATTERN_ARRAY: [i8; 4] = [0, 1, 0, -1];
 
 #[derive(Debug)]
 struct Pattern {
-    pattern_width: u32,
-    position: u32,
+    pattern_width: usize,
+    position: usize,
 }
 
 impl Iterator for Pattern {
@@ -20,18 +20,30 @@ impl Iterator for Pattern {
     }
 }
 
-fn pattern(output_position: u32) -> Pattern {
+fn pattern(output_position: usize) -> Pattern {
     Pattern {
         pattern_width: output_position,
         position: 0,
     }
 }
 
-fn multiply_with_pattern(digits: Vec<i8>, output_position: u32) -> Vec<i8> {
+fn multiply_with_pattern(digits: &Vec<i8>, output_position: usize) -> Vec<i8> {
     digits
         .iter()
         .zip(pattern(output_position))
         .map(|(digit, pattern_multiplier)| digit * pattern_multiplier)
+        .collect()
+}
+
+fn fft(digits: &Vec<i8>) -> Vec<i8> {
+    (0..digits.len())
+        .map(|i| {
+            multiply_with_pattern(digits, i + 1)
+                .iter()
+                .sum::<i8>()
+                .abs()
+                % 10
+        })
         .collect()
 }
 
@@ -73,17 +85,34 @@ mod tests {
     #[test]
     fn multiply_with_pattern_first_digit() {
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        let result = multiply_with_pattern(input, 1);
+        let result = multiply_with_pattern(&input, 1);
 
-        assert_eq!(vec![1, 0, -3, 0, 5, 0, -7, 0, 9, 0], result)
+        assert_eq!(vec![1, 0, -3, 0, 5, 0, -7, 0, 9, 0], result);
     }
 
     #[test]
     fn multiply_with_pattern_second_digit() {
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        let result = multiply_with_pattern(input, 2);
+        let result = multiply_with_pattern(&input, 2);
 
         assert_eq!(vec![0, 2, 3, 0, 0, -6, -7, 0, 0, 0], result)
     }
 
+    // FFT
+
+    #[test]
+    fn fft1() {
+        let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
+        let result = fft(&input);
+
+        assert_eq!(vec![4, 8, 2, 2, 6, 1, 5, 8], result)
+    }
+
+    #[test]
+    fn fft2() {
+        let input = vec![4, 8, 2, 2, 6, 1, 5, 8];
+        let result = fft(&input);
+
+        assert_eq!(vec![3, 4, 0, 4, 0, 4, 3, 8], result)
+    }
 }
