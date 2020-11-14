@@ -27,23 +27,25 @@ fn pattern(output_position: usize) -> Pattern {
     }
 }
 
-fn multiply_with_pattern(digits: &Vec<i8>, output_position: usize) -> Vec<i8> {
+fn multiply_with_pattern(digits: &[i8], output_position: usize) -> impl Iterator<Item = i8> + '_ {
     digits
         .iter()
         .zip(pattern(output_position))
         .map(|(digit, pattern_multiplier)| digit * pattern_multiplier)
-        .collect()
 }
 
-fn fft(digits: &Vec<i8>) -> Vec<i8> {
+fn pattern_sum(digits: &[i8], output_position: usize) -> u8 {
+    (multiply_with_pattern(digits, output_position)
+        .sum::<i8>()
+        .abs()
+        % 10)
+        .try_into()
+        .unwrap()
+}
+
+fn fft(digits: &Vec<i8>) -> Vec<u8> {
     (0..digits.len())
-        .map(|i| {
-            multiply_with_pattern(digits, i + 1)
-                .iter()
-                .sum::<i8>()
-                .abs()
-                % 10
-        })
+        .map(|i| pattern_sum(digits, i + 1))
         .collect()
 }
 
@@ -85,7 +87,7 @@ mod tests {
     #[test]
     fn multiply_with_pattern_first_digit() {
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        let result = multiply_with_pattern(&input, 1);
+        let result: Vec<i8> = multiply_with_pattern(&input, 1).collect();
 
         assert_eq!(vec![1, 0, -3, 0, 5, 0, -7, 0, 9, 0], result);
     }
@@ -93,7 +95,7 @@ mod tests {
     #[test]
     fn multiply_with_pattern_second_digit() {
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        let result = multiply_with_pattern(&input, 2);
+        let result: Vec<i8> = multiply_with_pattern(&input, 2).collect();
 
         assert_eq!(vec![0, 2, 3, 0, 0, -6, -7, 0, 0, 0], result)
     }
