@@ -27,24 +27,28 @@ fn pattern(output_position: usize) -> Pattern {
     }
 }
 
-fn multiply_with_pattern(digits: &[i8], output_position: usize) -> impl Iterator<Item = i8> + '_ {
+fn multiply_with_pattern(digits: &[u8], output_position: usize) -> impl Iterator<Item = i8> + '_ {
     digits
         .iter()
         .zip(pattern(output_position))
-        .map(|(digit, pattern_multiplier)| digit * pattern_multiplier)
+        .map(|(digit, pattern_multiplier)| *digit as i8 * pattern_multiplier)
 }
 
-fn pattern_sum(digits: &[i8], output_position: usize) -> u8 {
+fn pattern_sum(digits: &[u8], output_position: usize) -> u8 {
     let result: i32 = multiply_with_pattern(digits, output_position)
         .map(|b| b as i32)
         .sum();
     (result.abs() % 10).try_into().unwrap()
 }
 
-fn fft(digits: &Vec<i8>) -> Vec<u8> {
+fn transform(digits: &[u8]) -> Vec<u8> {
     (0..digits.len())
         .map(|i| pattern_sum(digits, i + 1))
         .collect()
+}
+
+fn fft(digits: &[u8], num_transforms: i32) -> Vec<u8> {
+    (0..num_transforms).fold(digits.to_vec(), |acc, _i| transform(&acc))
 }
 
 #[cfg(test)]
@@ -98,21 +102,34 @@ mod tests {
         assert_eq!(vec![0, 2, 3, 0, 0, -6, -7, 0, 0, 0], result)
     }
 
-    // FFT
+    // Transformation
 
     #[test]
-    fn fft1() {
+    fn test_transform1() {
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
-        let result = fft(&input);
+        let result = transform(&input);
 
         assert_eq!(vec![4, 8, 2, 2, 6, 1, 5, 8], result)
     }
 
     #[test]
-    fn fft2() {
+    fn test_transform2() {
         let input = vec![4, 8, 2, 2, 6, 1, 5, 8];
-        let result = fft(&input);
+        let result = transform(&input);
 
         assert_eq!(vec![3, 4, 0, 4, 0, 4, 3, 8], result)
+    }
+
+    // FFT (multiple transformations)
+
+    #[test]
+    fn test_fft1() {
+        let input = vec![
+            8, 0, 8, 7, 1, 2, 2, 4, 5, 8, 5, 9, 1, 4, 5, 4, 6, 6, 1, 9, 0, 8, 3, 2, 1, 8, 6, 4, 5,
+            5, 9, 5,
+        ];
+        let result = fft(&input, 100);
+
+        assert_eq!(vec![2, 4, 1, 7, 6, 1, 7, 6,], &result[..8])
     }
 }
