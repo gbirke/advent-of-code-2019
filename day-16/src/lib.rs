@@ -35,6 +35,13 @@ fn multiply_with_pattern(digits: &[u8], output_position: usize) -> impl Iterator
 }
 
 fn pattern_sum(digits: &[u8], output_position: usize) -> u8 {
+    // optimization for later stages when the first half of the pattern consists of zeroes and
+    // the next half of ones
+    if output_position > digits.len() / 2 {
+        let rest_digits = digits.to_vec().split_off(output_position-1);
+        let result: i32 = rest_digits.iter().map(|&b| b as i32).sum();
+        return (result.abs() % 10).try_into().unwrap()
+    }
     let result: i32 = multiply_with_pattern(digits, output_position)
         .map(|b| b as i32)
         .sum();
