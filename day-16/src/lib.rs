@@ -47,7 +47,7 @@ fn transform(digits: &[u8]) -> Vec<u8> {
         .collect()
 }
 
-fn fft(digits: &[u8], num_transforms: i32) -> Vec<u8> {
+pub fn fft(digits: &[u8], num_transforms: i32) -> Vec<u8> {
     (0..num_transforms).fold(digits.to_vec(), |acc, _i| transform(&acc))
 }
 
@@ -131,5 +131,16 @@ mod tests {
         let result = fft(&input, 100);
 
         assert_eq!(vec![2, 4, 1, 7, 6, 1, 7, 6,], &result[..8])
+    }
+
+    #[test]
+    fn test_fft2() {
+        let input = vec![
+            1, 9, 6, 1, 7, 8, 0, 4, 2, 0, 7, 2, 0, 2, 2, 0, 9, 1, 4, 4, 9, 1, 6, 0, 4, 4, 1, 8, 9,
+            9, 1, 7,
+        ];
+        let result = fft(&input, 100);
+
+        assert_eq!(vec![7, 3, 7, 4, 5, 4, 1, 8], &result[..8])
     }
 }
