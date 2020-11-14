@@ -35,12 +35,10 @@ fn multiply_with_pattern(digits: &[i8], output_position: usize) -> impl Iterator
 }
 
 fn pattern_sum(digits: &[i8], output_position: usize) -> u8 {
-    (multiply_with_pattern(digits, output_position)
-        .sum::<i8>()
-        .abs()
-        % 10)
-        .try_into()
-        .unwrap()
+    let result: i32 = multiply_with_pattern(digits, output_position)
+        .map(|b| b as i32)
+        .sum();
+    (result.abs() % 10).try_into().unwrap()
 }
 
 fn fft(digits: &Vec<i8>) -> Vec<u8> {
